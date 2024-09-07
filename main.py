@@ -1,6 +1,5 @@
 import numpy as np
 import cv2
-from playsound import playsound
 import time
 import datetime
 import threading
