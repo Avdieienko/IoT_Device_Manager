@@ -6,6 +6,9 @@ import threading
 import awsManager as aws
 import helpers
 
+# Create temp_storage folder if not exist
+helpers.create_temp_storage()
+
 alg = "haarcascade_frontalface_default.xml"
 haar_cascade = cv2.CascadeClassifier(alg)
 
@@ -105,7 +108,7 @@ while True:
                 timer_started = False
                 out.release()
                 if(detection_stopped_time - start_time > 5):
-                    aws.upload_to_s3_with_temporary_credentials(f"../temp_storage/{date}.mp4","security-camera-videos",f"{date}.mp4",credentials, tags)
+                    aws.upload_to_s3_with_temporary_credentials(f"./temp_storage/{date}.mp4","security-camera-videos",f"{date}.mp4",credentials, tags)
                 print("-------------\nFinished")
                 helpers.cleanup()
         #Start timer
@@ -122,7 +125,7 @@ while True:
             out.release()
             detection_stopped_time = time.time()
             if(detection_stopped_time - start_time > 5):
-                aws.upload_to_s3_with_temporary_credentials(f"../temp_storage/{date}.mp4","security-camera-videos",f"{date}.mp4",credentials, tags)
+                aws.upload_to_s3_with_temporary_credentials(f"./temp_storage/{date}.mp4","security-camera-videos",f"{date}.mp4",credentials, tags)
             print("-------------\nFinished")
         helpers.cleanup()
         break
