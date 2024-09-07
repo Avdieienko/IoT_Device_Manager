@@ -1,1 +1,5 @@
-{"deviceName": "test_py", "cameraType": "Logitech", "deviceType": "RasPi-5", "deviceID": "10343298"}
+{
+  "deviceName": "YOUR-DEVICE-NAME",
+  "cameraType": "YOUR-CAMERA",
+  "deviceType": "YOUR-DEVICE-TYPE"
+}
