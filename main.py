@@ -5,6 +5,7 @@ import datetime
 import threading
 import awsManager as aws
 import helpers
+import os
 
 # Create temp_storage folder if not exist
 helpers.create_temp_storage()
@@ -17,8 +18,7 @@ count = 1
 prev_frame = None
 cap = cv2.VideoCapture(0)
 frame_size = (int(cap.get(3)), int(cap.get(4)))
-fourcc = cv2.VideoWriter_fourcc(*"avc1")
-# fourcc = cv2.VideoWriter_fourcc(*"H264")
+fourcc = cv2.VideoWriter_fourcc(*"mp4v")
 
 
 client = aws.configure_aws_user()
@@ -27,13 +27,24 @@ credentials = aws.assume_role(client, "test" ,tags, "IoTDeviceWriteVideo")
 role_start = time.time()
 role_end = 1190
 out = None
+# Date for the video name; should be set for threading
+date = None
 
 def renew_credentials():
     global credentials, credentials_thread
     credentials = aws.assume_role(client, "test" ,tags, "IoTDeviceWriteVideo")
     credentials_thread = threading.Thread(target=renew_credentials)
 
+def save_recording():
+    global date, recording_thread, credentials, tags
+    cur_date = date
+    os.system(f'sh codec_convert.sh ./temp_storage/mp4v/{cur_date}.mp4 ./temp_storage/h264/{cur_date}.mp4')
+    aws.upload_to_s3_with_temporary_credentials(f"./temp_storage/h264/{cur_date}.mp4", "security-camera-videos", f"{cur_date}.mp4", credentials, tags)
+    helpers.cleanup()
+    recording_thread = threading.Thread(target=save_recording)
+
 credentials_thread = threading.Thread(target=renew_credentials)
+recording_thread = threading.Thread(target=save_recording)
 
 
 detection = False
@@ -96,7 +107,7 @@ while True:
             detection = True
             start_time = time.time()
             date = datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
-            out = cv2.VideoWriter(f"../temp_storage/{date}.mp4", fourcc, 20, frame_size)
+            out = cv2.VideoWriter(f"./temp_storage/mp4v/{date}.mp4", fourcc, 20, frame_size)
             print("Recording...")
     #If no movement was detected but it was detected before
     elif detection:
@@ -108,9 +119,10 @@ while True:
                 timer_started = False
                 out.release()
                 if(detection_stopped_time - start_time > 5):
-                    aws.upload_to_s3_with_temporary_credentials(f"./temp_storage/{date}.mp4","security-camera-videos",f"{date}.mp4",credentials, tags)
+                    recording_thread.start()
+                    # os.system(f'sh codec_convert.sh ./temp_storage/mp4v/{date}.mp4 ./temp_storage/h264/{date}.mp4')
+                    # aws.upload_to_s3_with_temporary_credentials(f"./temp_storage/h264/{date}.mp4", "security-camera-videos", f"{date}.mp4", credentials, tags)
                 print("-------------\nFinished")
-                helpers.cleanup()
         #Start timer
         else:
             timer_started = True
@@ -125,7 +137,8 @@ while True:
             out.release()
             detection_stopped_time = time.time()
             if(detection_stopped_time - start_time > 5):
-                aws.upload_to_s3_with_temporary_credentials(f"./temp_storage/{date}.mp4","security-camera-videos",f"{date}.mp4",credentials, tags)
+                os.system(f'sh codec_convert.sh ./temp_storage/mp4v/{date}.mp4 ./temp_storage/h264/{date}.mp4')
+                aws.upload_to_s3_with_temporary_credentials(f"./temp_storage/h264/{date}.mp4", "security-camera-videos", f"{date}.mp4", credentials, tags)
             print("-------------\nFinished")
         helpers.cleanup()
         break

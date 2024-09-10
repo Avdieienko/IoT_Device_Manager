@@ -138,7 +138,10 @@ def upload_to_s3_with_temporary_credentials(file_name, bucket, object_name, temp
         file_name,
         bucket,
         object_name,
-        ExtraArgs={"Tagging": parse.urlencode(tags)}
+        ExtraArgs={
+          "Tagging": parse.urlencode(tags),
+          "ContentType": "video/mp4"
+          }
     )
     print(f"File {file_name} uploaded to {bucket}/{object_name}")
     return True
