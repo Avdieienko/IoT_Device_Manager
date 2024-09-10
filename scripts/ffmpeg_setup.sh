@@ -41,15 +41,6 @@ install_ffmpeg_macos() {
   brew install ffmpeg
 }
 
-# Function to check if ffmpeg is installed
-check_ffmpeg_installed() {
-  if command -v ffmpeg &> /dev/null; then
-    echo "ffmpeg is already installed."
-    ffmpeg -version
-    exit 0
-  fi
-}
-
 # Detect operating system and install ffmpeg accordingly
 install_ffmpeg() {
   OS="$(uname)"
@@ -74,7 +65,7 @@ install_ffmpeg() {
 
 # Function to check if ffmpeg is installed
 check_ffmpeg() {
-  if ! command -v ffmpeg &> /dev/null; then
+  if ! ffmpeg -version >/dev/null 2>&1; then
     echo "Ffmpeg is not installed."
     install_ffmpeg
   else

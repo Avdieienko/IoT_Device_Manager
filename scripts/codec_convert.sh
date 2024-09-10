@@ -2,7 +2,7 @@
 
 # Function to check if ffmpeg is installed
 check_ffmpeg() {
-    if ! command -v ffmpeg &> /dev/null; then
+    if ! ffmpeg -version >/dev/null 2>&1; then
         echo "Error: ffmpeg is not installed."
         exit 1
     fi
