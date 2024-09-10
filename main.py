@@ -7,6 +7,8 @@ import awsManager as aws
 import helpers
 import os
 
+os.system(f'sh ./scripts/ffmpeg_setup.sh')
+
 # Create temp_storage folder if not exist
 helpers.create_temp_storage()
 
@@ -19,7 +21,6 @@ prev_frame = None
 cap = cv2.VideoCapture(0)
 frame_size = (int(cap.get(3)), int(cap.get(4)))
 fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-
 
 client = aws.configure_aws_user()
 tags = aws.configure_IoT_device(client)
@@ -38,7 +39,7 @@ def renew_credentials():
 def save_recording():
     global date, recording_thread, credentials, tags
     cur_date = date
-    os.system(f'sh codec_convert.sh ./temp_storage/mp4v/{cur_date}.mp4 ./temp_storage/h264/{cur_date}.mp4')
+    os.system(f'sh ./scripts/codec_convert.sh ./temp_storage/mp4v/{cur_date}.mp4 ./temp_storage/h264/{cur_date}.mp4')
     aws.upload_to_s3_with_temporary_credentials(f"./temp_storage/h264/{cur_date}.mp4", "security-camera-videos", f"{cur_date}.mp4", credentials, tags)
     helpers.cleanup()
     recording_thread = threading.Thread(target=save_recording)
@@ -108,7 +109,7 @@ while True:
             start_time = time.time()
             date = datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
             out = cv2.VideoWriter(f"./temp_storage/mp4v/{date}.mp4", fourcc, 20, frame_size)
-            print("Recording...")
+            print("-------------\nRecording...\n-------------")
     #If no movement was detected but it was detected before
     elif detection:
         #If the recording already in proccess
@@ -120,9 +121,7 @@ while True:
                 out.release()
                 if(detection_stopped_time - start_time > 5):
                     recording_thread.start()
-                    # os.system(f'sh codec_convert.sh ./temp_storage/mp4v/{date}.mp4 ./temp_storage/h264/{date}.mp4')
-                    # aws.upload_to_s3_with_temporary_credentials(f"./temp_storage/h264/{date}.mp4", "security-camera-videos", f"{date}.mp4", credentials, tags)
-                print("-------------\nFinished")
+                print("-------------\nFinished\n-------------")
         #Start timer
         else:
             timer_started = True
@@ -137,9 +136,10 @@ while True:
             out.release()
             detection_stopped_time = time.time()
             if(detection_stopped_time - start_time > 5):
-                os.system(f'sh codec_convert.sh ./temp_storage/mp4v/{date}.mp4 ./temp_storage/h264/{date}.mp4')
+                os.system(f'sh ./scripts/codec_convert.sh ./temp_storage/mp4v/{date}.mp4 ./temp_storage/h264/{date}.mp4')
                 aws.upload_to_s3_with_temporary_credentials(f"./temp_storage/h264/{date}.mp4", "security-camera-videos", f"{date}.mp4", credentials, tags)
-            print("-------------\nFinished")
+            print("-------------\nFinished\n-------------")
+            print("-------------\nExiting...\n-------------")
         helpers.cleanup()
         break
 cap.release()

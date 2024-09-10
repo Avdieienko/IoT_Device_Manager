@@ -17,4 +17,4 @@ def create_temp_storage():
     os.makedirs("./temp_storage")
     os.makedirs("./temp_storage/mp4v")
     os.makedirs("./temp_storage/h264")
-    print("-----\nTemp storage was created")
+    print("-----\nTemp storage was created\n-----")

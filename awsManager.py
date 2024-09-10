@@ -94,7 +94,7 @@ def configure_IoT_device(session):
       with open("device_config.json", "w") as config_json:
         json.dump(tags, config_json)
     except Exception as e:
-      print(f"Error regsitering device: {e}")
+      print(f"-------------\nAWS Device error: Error registering device: {e}\n-------------")
       return None
 
 
@@ -116,7 +116,7 @@ def assume_role(console, session_name, role_tags, role_name):
       DurationSeconds=1200,
     )
   except ClientError as e:
-    print(f"Error assuming role: {e}")
+    print(f"-------------\nAWS Role error: Error assuming role: {e}\n-------------")
     return None
 
   return response['Credentials']
@@ -143,14 +143,14 @@ def upload_to_s3_with_temporary_credentials(file_name, bucket, object_name, temp
           "ContentType": "video/mp4"
           }
     )
-    print(f"File {file_name} uploaded to {bucket}/{object_name}")
+    print(f"-------------\nFile {file_name} uploaded to {bucket}/{object_name}\n-------------")
     return True
   except FileNotFoundError:
-    print("The file was not found")
+    print("-------------\nAWS upload error: The file was not found\n-------------")
     return False
   except NoCredentialsError:
-    print("Credentials not available")
+    print("-------------\nAWS upload error: Credentials not available\n-------------")
     return False
   except ClientError as e:
-    print(f"Error uploading file: {e}")
+    print(f"-------------\nAWS upload error: Error uploading file: {e}\n-------------")
     return False
