@@ -7,9 +7,9 @@ install_ffmpeg_ubuntu() {
   sudo apt install -y ffmpeg
 }
 
-# Function to install ffmpeg on Windows using Chocolatey
+# Function to install ffmpeg on Windows using Winget
 install_ffmpeg_windows() {
-  echo "Installing ffmpeg on Windows using Chocolatey..."
+  echo "Installing ffmpeg on Windows using wget..."
 
   # Check if the script is running with admin rights using PowerShell
   is_admin=$(powershell -Command "([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)")
@@ -20,15 +20,10 @@ install_ffmpeg_windows() {
     exit 1
   fi
 
-  # Check if Chocolatey is installed
-  if ! command -v choco &> /dev/null; then
-    echo "Error: Chocolatey is not installed. Please install Chocolatey first."
-    echo "You can install Chocolatey by following instructions at https://chocolatey.org/install"
-    exit 1
-  fi
+  # Install ffmpeg using Winget
+  winget install "FFmpeg (Essentials Build)"
 
-  # Install ffmpeg using Chocolatey
-  choco install ffmpeg -y
+  echo "Installation complete. Restart your terminal, camera-app(if started from vscode terminal - restart vs code) and try again."
 }
 
 # Function to install ffmpeg on macOS using Homebrew
