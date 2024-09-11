@@ -4,6 +4,7 @@
 check_ffmpeg() {
     if ! ffmpeg -version >/dev/null 2>&1; then
         echo "Error: ffmpeg is not installed."
+        echo "Please install ffmpeg by running the ./scripts/ffmpeg_setup.sh script."
         exit 1
     fi
 }
