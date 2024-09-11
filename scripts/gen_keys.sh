@@ -30,6 +30,7 @@ elif [ -f /etc/redhat-release ]; then
   fi
 else
   echo "Unsupported Linux distribution. Please install OpenSSL manually before proceeding."
+  echo "If you are using Windows, please install it manually or add existing in PATH ."
   exit 1
 fi
 

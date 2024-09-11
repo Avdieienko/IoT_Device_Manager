@@ -7,8 +7,6 @@ import awsManager as aws
 import helpers
 import os
 
-os.system(f'sh ./scripts/ffmpeg_setup.sh')
-
 # Create temp_storage folder if not exist
 helpers.create_temp_storage()
 
